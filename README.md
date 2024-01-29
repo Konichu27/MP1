@@ -26,6 +26,8 @@
 For issues, PM in Messenger/Discord (even *I* don't fully understand everything, sooooo)
 
 # Java project details
+Class repo: https://drive.google.com/drive/folders/1gU_KUPsmjTJbfqW_hqUwpraXv0Joc7Nc
+
 Project name: `MP1_2CSC_Dayao_Esguerra_Gulifardo`
 
 Package name: `test`
@@ -37,9 +39,10 @@ Username: `app`
 Password: `app`
 
 **NOTE:** In order for the project to work properly, you need to insert derbyclient.jar into the project.
-1. Install the derbyclient.jar in the class repo/this repo (there is one already in NetBeans but it will not work)
-2. Open the NetBeans project in the Projects menu
-3. Right-click on Libraries and click Add Library...
+1. Install the derbyclient.jar in the class repo/this repo (there is one already in NetBeans but it will not work):
+  - https://drive.google.com/file/d/1ewfVX-lMtpjIVBg5khUe_emp1l1uuCBK/view?usp=drive_link (must be logged in on your UST account)
+2. Open the NetBeans project in the *Projects* menu
+3. Right-click on *Libraries* and click *Add Library...*
 4. Insert the .jar file
 
 # Database details
