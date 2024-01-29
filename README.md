@@ -1,3 +1,15 @@
+# How to use GitHub
+**Git Terminologies**
+- Git - program used by developers to share, update, & delete code
+- Commit - save changes thru Git locally
+- Push - save changes to repository online
+- Clone - download copy of repository
+1. Sign up for an account, PM w/ username for invitation
+2. Download & install git.exe: https://git-scm.com/downloads
+3. Clone repository following these instructions: https://netbeans.apache.org/tutorial/main/kb/docs/ide/git/ (scroll to Cloning a Git Repository)
+To commit/push, follow these instructions: https://mauricemuteti2015.medium.com/how-to-upload-push-add-netbeans-java-project-to-github-d3c098922663 (3-11 primarily)
+For issues, PM in Messenger/Discord
+
 # Java project details
 Project name: `MP1_2CSC_Dayao_Esguerra_Gulifardo`
 
