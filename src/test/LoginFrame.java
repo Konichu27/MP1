@@ -20,7 +20,7 @@ public class LoginFrame extends JFrame {
     JTextField userField;
     JPasswordField passField;
     JButton loginButton;
-
+ 
     LoginFrame() {
         setTitle("Login Form");
         setSize(375, 275);
