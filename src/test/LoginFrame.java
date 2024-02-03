@@ -59,7 +59,8 @@ public class LoginFrame extends JFrame {
         // - Driver & DB connection code
         // - Guest & admin windows (see MP1 .xsl guidelines)
         // - Some other stuff perhaps being missed
-
+        
+        
     }
 
     public static void main(String[] args) {
