@@ -82,9 +82,9 @@ public class TestStatement {
             PreparedStatement ps = con.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
             
-            switch (loginUrole) {
+            switch (loginUrole.toUpperCase()) {
                 case "ADMIN":
-                    AdminWindow aw = new AdminWindow(con, rs);
+                    AdminWindow aw = new AdminWindow(loginUname, loginPword, con, rs);
                      break;
                 case "GUEST": 
                     GuestWindow gw = new GuestWindow(rs);
