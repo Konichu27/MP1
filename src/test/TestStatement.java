@@ -84,8 +84,8 @@ public class TestStatement {
             
             switch (loginUrole) {
                 case "ADMIN":
-                    //AdminWindow aw = new AdminWindow(con, rs);
-                    // break;
+                    AdminWindow aw = new AdminWindow(con, rs);
+                     break;
                 case "GUEST": 
                     GuestWindow gw = new GuestWindow(rs);
                     break;

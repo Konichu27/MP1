@@ -18,6 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 class AdminWindow /*extends JFrame*/ {
     
@@ -52,18 +53,34 @@ class AdminWindow /*extends JFrame*/ {
                 System.out.println(instructions);
                 
                 cmdInput = scanCmd.nextLine().trim();
-                
                 switch (cmdInput) {
-                    case ADD_KEY:
+                    case ADD_KEY: // WORK-IN-PROGRESS!!!!
                         String addRecord = "INSERT INTO users " +
                                 "(Email, Password, UserRole) " + 
                                 "VALUES (?, ?, ?)";
                         try {
                             PreparedStatement psAdd = con.prepareStatement(addRecord);
+                            
+                            // Set email
                             System.out.println("Set email:");
                             psAdd.setString(1, scanCmd.nextLine()); // TODO check first if email exists, if possible.
+                            
+                            // Set password
                             System.out.println("Set password:");
+                            String error = "a", newPword;
+                            
+                            while(!error.equals("")) {
+                                newPword = scanCmd.nextLine();
+                                error = validatePword(newPword);
+                                System.out.println("!error.equals(\"\") is " + !error.equals(""));
+                                if (!error.equals("")) {
+                                    System.out.println(error);
+                                    System.out.println("Please input again.");
+                            }
+                        }
                             psAdd.setString(2, scanCmd.nextLine()); // TODO add password verification. This will be a separate function in the future.
+                            
+                            // Set user role
                             System.out.println("Set user role:");
                             psAdd.setString(3, scanCmd.nextLine().trim().toUpperCase()); // TODO check if GUEST or ADMIN only.
                             psAdd.executeUpdate();
@@ -88,4 +105,18 @@ class AdminWindow /*extends JFrame*/ {
             }
     }
     
+    private String validatePword(String pword) {
+        //Pattern ucase = Pattern.compile("[A-Z]+");
+        String error = "";
+        System.out.println("New password is " + pword);
+        if (!pword.matches("[A-Z]"))
+            error += "Password must have at least 1 uppercase letter.\n";
+        if (!pword.matches("[a-z]"))
+            error += "Password must have at least 1 lowercase letter.\n";
+        if (!pword.matches("[0-9]"))
+            error += "Password must have at least 1 number.\n";
+        if (!pword.matches("[^A-Za-z0-9]"))
+            error += "Password must have at least 1 special character.\n";
+        return error;
+    }
 }
