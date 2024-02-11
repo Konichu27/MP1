@@ -64,8 +64,7 @@ public class TestStatement {
                 }
                 // "INCORRECT" Error Window
                 System.out.println("Incorrect username and/or password.");
-                c++;
-                System.out.println(3-c + " tries left.");
+                System.out.println(3-c++ + " tries left.");
                 // OK Button that closes window
                 
                 // "FINISHED" Error Window
