@@ -16,6 +16,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -93,7 +95,6 @@ public class TestStatement
             {
                 LoginDialog ld = new LoginDialog(con);
                 ld.startApp();
-                
                 String query = "SELECT * FROM USERS ORDER BY Email";
                 PreparedStatement ps = con.prepareStatement(query);
                 ResultSet rs = ps.executeQuery();
@@ -103,10 +104,11 @@ public class TestStatement
                         AdminWindow aw = new AdminWindow(uname, pword, con, rs);
                         break;
                     case "GUEST":
-                        GuestWindow gw = new GuestWindow(rs);
+                        GuestUI gui = new GuestUI(rs);
                         break;
                 }
                 rs.close();
+                ps.close();
             }
         } catch (SQLNonTransientConnectionException ce)
         {
@@ -189,7 +191,17 @@ public class TestStatement
                 @Override
                 public void windowClosing(WindowEvent e)
                 {
-                    System.exit(0);
+                    dispose();
+                    try
+                    {
+                        con.close();
+                    } catch (SQLException sqle)
+                    {
+                        System.out.println("Unexpected error after exiting app! Please consult.");
+                        sqle.printStackTrace();
+                    } finally {
+                        System.exit(0);
+                    }
                 }
             });
             setVisible(true);
@@ -205,60 +217,65 @@ public class TestStatement
         public void keyPressed(KeyEvent e)
         {
             if (e.getKeyCode() == KeyEvent.VK_ENTER)
+            {
                 loginRequest();
+            }
         }
-        private void loginRequest() {
-                try
-                {
-                    // Verify W/ Server
-                    String VER_QUERY = "SELECT * FROM USERS "
-                            + "WHERE Email = ?";
-                    uname = userField.getText(); // REFERS TO OUTER CLASS/MAIN OBJECT.
-                    pword = passField.getText(); // REFERS TO OUTER CLASS/MAIN OBJECT.
-                    PreparedStatement accPs = con.prepareStatement(VER_QUERY);
-                    accPs.setString(1, uname);
-                    ResultSet accRs = accPs.executeQuery();
-                    if (accRs.next())
-                    { // next() method returns false if no corresp. entry is found.
-                        if (accRs.getString("Password").matches(pword))
-                        {
-                            urole = accRs.getString("UserRole"); // REFERS TO OUTER CLASS/MAIN OBJECT.
-                            JOptionPane.showMessageDialog(null, "Successfully logged in.");
-                            accRs.close();
-                            accPs.close();
-                            this.dispose();
-                            return;
-                        }
-                    }
-                    // "INCORRECT" Error Window
-                    if (count < 3)
+        private void loginRequest()
+        {
+            try
+            {
+                // Verify W/ Server
+                String VER_QUERY = "SELECT * FROM USERS "
+                        + "WHERE Email = ?";
+                uname = userField.getText(); // REFERS TO OUTER CLASS/MAIN OBJECT.
+                pword = passField.getText(); // REFERS TO OUTER CLASS/MAIN OBJECT.
+                PreparedStatement accPs = con.prepareStatement(VER_QUERY);
+                accPs.setString(1, uname);
+                ResultSet accRs = accPs.executeQuery();
+                if (accRs.next())
+                { // next() method returns false if no corresp. entry is found.
+                    if (accRs.getString("Password").matches(pword))
                     {
-                        JOptionPane.showMessageDialog(null,
-                                "Incorrect username and/or password.\n" + (3 - count++) + " tries left.",
-                                "Error", JOptionPane.ERROR_MESSAGE);
-                    } // "FINISHED" Error Window
-                    else
-                    {
-                        JOptionPane.showMessageDialog(null, "Sorry, you have reached the limit of 3 tries. Good bye!",
-                                "Error", JOptionPane.ERROR_MESSAGE);
+                        urole = accRs.getString("UserRole"); // REFERS TO OUTER CLASS/MAIN OBJECT.
+                        JOptionPane.showMessageDialog(null, "Successfully logged in.");
                         accRs.close();
                         accPs.close();
-                        con.close();
-                        System.exit(0);
+                        this.dispose();
+                        return;
                     }
-                } catch (SQLException sqle)
+                }
+                // "INCORRECT" Error Window
+                if (count < 3)
                 {
-                    JOptionPane.showMessageDialog(null, "There was an error in the database loading. Program will now close",
+                    JOptionPane.showMessageDialog(null,
+                            "Incorrect username and/or password.\n" + (3 - count++) + " tries left.",
                             "Error", JOptionPane.ERROR_MESSAGE);
-                    sqle.printStackTrace();
+                } // "FINISHED" Error Window
+                else
+                {
+                    JOptionPane.showMessageDialog(null, "Sorry, you have reached the limit of 3 tries. Good bye!",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    accRs.close();
+                    accPs.close();
+                    con.close();
                     System.exit(0);
                 }
+            } catch (SQLException sqle)
+            {
+                JOptionPane.showMessageDialog(null, "There was an error in the database loading. Program will now close",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                sqle.printStackTrace();
+                System.exit(0);
+            }
         }
         @Override
         public void keyTyped(KeyEvent e)
-        {}
+        {
+        }
         @Override
         public void keyReleased(KeyEvent e)
-        {}
+        {
+        }
     }
 }
