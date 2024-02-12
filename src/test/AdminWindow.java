@@ -193,7 +193,9 @@ class AdminWindow /*extends JFrame*/ {
                     psUpdate.setString(2, scanCmd.nextLine());
                     psUpdate.setString(3, updateEmail);
                 }
-                psUpdate.executeUpdate();
+                if (psUpdate.executeUpdate() < 1) {
+                    System.out.println("No records were updated.");
+                }
             }
             catch (SQLException sqle) {
                 printError(sqle, UPDATE_KEY);
@@ -223,7 +225,9 @@ class AdminWindow /*extends JFrame*/ {
 
                 //System.out.println("psDelete is " + psDelete.toString());
                 psDelete.setString(1, deleteEmail);
-                psDelete.executeUpdate();
+                if (psDelete.executeUpdate() < 1) {
+                    System.out.println("No records were updated.");
+                }
             }
             catch (SQLException sqle) {
                 printError(sqle, DELETE_KEY);
