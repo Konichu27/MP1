@@ -1,21 +1,26 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
-public class AddRecord extends JFrame {
+public class AddRecord extends JDialog {
+    private Container c;
+    private Connection con;
+    private JLabel userLabel, passLabel, confPLabel, roleLabel;
+    private JTextField userField;
+    private JPasswordField passField, confPass;
+    private JButton add, cancel;
+    private JRadioButton adminRadioButton, guestRadioButton;
+    private ButtonGroup roleGroup;
 
-    Container c;
-    JLabel userLabel, passLabel, confPLabel, roleLabel;
-    JTextField userField;
-    JPasswordField passField, confPass;
-    JButton add, cancel;
-    JRadioButton adminRadioButton, guestRadioButton;
-    ButtonGroup roleGroup;
-
-    public AddRecord() {
+    public AddRecord(Connection con) {
+        this.con = con;
         setTitle("Add Record");
         setSize(500, 400);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         c = getContentPane();
         c.setLayout(null);
@@ -70,15 +75,70 @@ public class AddRecord extends JFrame {
         cancel = new JButton("Cancel");
         cancel.setBounds(250, 270, 90, 30);
         panel.add(cancel);
+        
+        cancel.addActionListener((ActionEvent e) ->
+        {
+            dispose(); // exits the program when logout button is clicked
+        });
 
         c.add(panel);
 
         setVisible(true);
     }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            AddRecord addRecord = new AddRecord();
-        });
+    
+    private void addRecord() throws SQLException {
+        String error = "";
+        String uname = userField.getText();
+        String pword = passField.getText();
+        String confPword = confPass.getText();
+        String urole = "";
+        
+        if (uname.equals("") || uname == null) {
+            error += "Username must not be empty.\n";
+        }
+        if (pword.equals("") || pword == null) {
+            error += "Password must not be empty.\n";
+        } else {
+            if (!pword.matches(".*[A-Z]+.*"))
+                error += "Password must have at least 1 uppercase letter.\n";
+            if (!pword.matches(".*[a-z]+.*"))
+                error += "Password must have at least 1 lowercase letter.\n";
+            if (!pword.matches(".*[0-9]+.*"))
+                error += "Password must have at least 1 number.\n";
+            if (!pword.matches(".*[^A-Za-z0-9]+.*"))
+                error += "Password must have at least 1 special character.\n";
+        }
+        if (!pword.matches(confPword)) {
+            error += "Passwords do not match.\n";
+        }
+        if (guestRadioButton.isSelected()) {
+            urole = guestRadioButton.getText();
+        } else
+        if (adminRadioButton.isSelected()) {
+            urole = adminRadioButton.getText();
+        }
+        else {
+            error += "Selected role is somehow invalid. Please check again.\n";
+        }
+        
+        if (!error.matches("")) {
+            JOptionPane.showMessageDialog(null, error, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        else
+        {
+            try (PreparedStatement psAdd = con.prepareStatement(
+                    "INSERT INTO users "
+                    + "(Email, Password, UserRole) "
+                    + "VALUES (?, ?, ?)"))
+            {
+                psAdd.setString(1, uname);
+                psAdd.setString(2, pword);
+                psAdd.setString(3, urole);
+                psAdd.executeUpdate();
+            }
+            JOptionPane.showMessageDialog(null, "Record adding successful.");
+            dispose();
+        }
     }
+    
 }
