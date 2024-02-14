@@ -5,7 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class AddRecord extends JDialog {
+/*class AddRecord extends JDialog {
     private Container c;
     private Connection con;
     private JLabel userLabel, passLabel, confPLabel, roleLabel;
@@ -21,6 +21,7 @@ public class AddRecord extends JDialog {
         setSize(500, 400);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        setModal(true);
 
         c = getContentPane();
         c.setLayout(null);
@@ -134,11 +135,13 @@ public class AddRecord extends JDialog {
                 psAdd.setString(1, uname);
                 psAdd.setString(2, pword);
                 psAdd.setString(3, urole);
-                psAdd.executeUpdate();
+                if (psAdd.executeUpdate() <= 0) {
+                    JOptionPane.showMessageDialog(null, "No records were updated.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                else {
+                    JOptionPane.showMessageDialog(null, "Record adding successful.");
+                };
             }
-            JOptionPane.showMessageDialog(null, "Record adding successful.");
-            dispose();
         }
     }
-    
-}
+}*/

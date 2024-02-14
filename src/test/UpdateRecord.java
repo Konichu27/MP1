@@ -1,8 +1,16 @@
+/*
 import javax.swing.*;
 import java.awt.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public class UpdateRecord extends JFrame {
-
+class UpdateRecord extends JDialog {
+// public class UpdateRecord extends JDialog { 
+    private Connection con;
+    private String adminUname;
+    
     Container c;
     JLabel userLabel, passLabel, confPLabel, roleLabel;
     JTextField userField;
@@ -11,11 +19,16 @@ public class UpdateRecord extends JFrame {
     JRadioButton adminRadioButton, guestRadioButton;
     ButtonGroup roleGroup;
 
-    public UpdateRecord() {
+    public UpdateRecord(Connection con, String adminUname) {
+        this.con = con;
+        this.adminUname = adminUname;
+        
         setTitle("Update Record");
         setSize(500, 400);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        // setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // setModal(true);
 
         c = getContentPane();
         c.setLayout(null);
@@ -75,10 +88,102 @@ public class UpdateRecord extends JFrame {
 
         setVisible(true);
     }
-
-    public static void main(String[] args) {
+    
+    private void updateRecord() throws SQLException
+        {
+            String error = "";
+            String uname = userField.getText();
+            String pword = passField.getText();
+            String confPword = confPass.getText();
+            String urole = "";
+            String checkedUrole = "";
+            if (uname.equals("") || uname == null)
+            {
+                error += "Username must not be empty.\n";
+            } else {
+                try (PreparedStatement psCheck = con.prepareStatement("SELECT UserRole FROM users WHERE Email = ?");) {
+                    psCheck.setString(1, uname);
+                    try (ResultSet rsCheck = psCheck.executeQuery()) {
+                        rsCheck.next();
+                        checkedUrole = rsCheck.getString("UserRole").trim();
+                        if (checkedUrole.equals("") || checkedUrole == null) {
+                            error += "Username does not exist in the database.\n";
+                        }
+                    }
+                }
+            }
+            if (pword.equals("") || pword == null)
+            {
+                error += "Password must not be empty.\n";
+            } else
+            {
+                if (!pword.matches(".*[A-Z]+.*"))
+                {
+                    error += "Password must have at least 1 uppercase letter.\n";
+                }
+                if (!pword.matches(".*[a-z]+.*"))
+                {
+                    error += "Password must have at least 1 lowercase letter.\n";
+                }
+                if (!pword.matches(".*[0-9]+.*"))
+                {
+                    error += "Password must have at least 1 number.\n";
+                }
+                if (!pword.matches(".*[^A-Za-z0-9]+.*"))
+                {
+                    error += "Password must have at least 1 special character.\n";
+                }
+            }
+            if (!pword.matches(confPword))
+            {
+                error += "Passwords do not match.\n";
+            }
+            if (guestRadioButton.isSelected())
+            {
+                urole = guestRadioButton.getText();
+            } else if (adminRadioButton.isSelected())
+            {
+                urole = adminRadioButton.getText();
+            } else if (checkedUrole.toUpperCase().equals("admin"))
+            {
+                error += "Selected role is invalid. Please check again.\n";
+            }
+            if (!error.matches(""))
+            {
+                JOptionPane.showMessageDialog(null, error, "Error", JOptionPane.ERROR_MESSAGE);
+            } else
+            {
+                if (checkedUrole.toUpperCase().equals("ADMIN"))
+                {
+                    try (PreparedStatement psAdd = con.prepareStatement(
+                            "UPDATE users "
+                            + "SET Password = ?, UserRole = ? "
+                            + "WHERE Email = ?"))
+                    {
+                        psAdd.setString(1, uname);
+                        psAdd.setString(2, pword);
+                        psAdd.setString(3, urole);
+                        psAdd.executeUpdate();
+                    }
+                } else {
+                    try (PreparedStatement psAdd = con.prepareStatement(
+                            "UPDATE users " +
+                            "SET Password = ? " + 
+                            "WHERE Email = ?"))
+                    {
+                        psAdd.setString(1, uname);
+                        psAdd.setString(2, pword);
+                        psAdd.executeUpdate();
+                    }
+                }
+                JOptionPane.showMessageDialog(null, "Record adding successful.");
+                refreshData(tableModel);
+        }
+    }
+}
+    /*public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             UpdateRecord updateRecord = new UpdateRecord();
         });
     }
-}
+}*/
